@@ -176,10 +176,23 @@ public class Game extends JFrame {
         this.add(panel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
+        
+        setup();
+        
         this.setVisible(true);
     }
     
     public final void run() { t.start(); }
+    
+    protected final void setIcon(BufferedImage b) {
+        this.setIconImage(b);
+    }
+    
+    protected final void setIcon(String relativePath) {
+        this.setIconImage(Util.loadImage(relativePath));
+    }
+    
+    protected void setup() { };
     
     protected void draw(int tick, Graphics g) { }
     protected void loop(int tick) { }
