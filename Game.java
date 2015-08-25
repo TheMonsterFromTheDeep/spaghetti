@@ -76,16 +76,15 @@ public class Game extends JFrame {
     private int tick = 0;
     
     private BufferedImage render() {
-        System.err.println(drawdata.buffer.getWidth());
         BufferedImage tmp = Util.scaleImage(drawdata.buffer,drawdata.drawWidth,drawdata.drawHeight);
-        System.err.println(tmp.getWidth());
         return tmp;
     }
     
-    public Game(String title, int defaultWidth, int defaultHeight) {
+    public Game(String title, int defaultWidth, int defaultHeight, double scale) {
         this.setTitle(title);
         
         drawdata = new DrawData(defaultWidth, defaultHeight);
+        drawdata.resize((int)(defaultWidth * scale), (int)(defaultHeight * scale));
         
         t = new Timer(10, new ActionListener() {
             @Override
@@ -172,7 +171,7 @@ public class Game extends JFrame {
                 panel.repaint();
             }
         };
-        panel.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
+        panel.setPreferredSize(new Dimension(drawdata.drawWidth, drawdata.drawHeight));
         this.add(panel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();

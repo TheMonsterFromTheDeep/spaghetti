@@ -39,12 +39,12 @@ public class Util {
         double rotx = b.getWidth() / 2;
         double roty = b.getHeight() / 2;
         AffineTransform at = AffineTransform.getRotateInstance(rot, rotx, roty);
-        AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+        AffineTransformOp op = new AffineTransformOp(at, null);
         
         return op.filter(b, null);
     }
     
-    private static Clip loadClip(String relativePath)
+    public static Clip loadClip(String relativePath)
     {
         try {
             Clip clip = AudioSystem.getClip();
