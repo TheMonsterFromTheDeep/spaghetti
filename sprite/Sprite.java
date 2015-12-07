@@ -20,9 +20,11 @@ public class Sprite {
     private int layer = 0;
     public int graphic = 0;
     
-    public double direction;
+    private double direction;
     
-    public int x, y;
+    private int x, y;
+    
+    CollisionMap collisionMap;
     
     public Sprite() { 
         x = 0;
@@ -85,5 +87,25 @@ public class Sprite {
     public void setLayer(int layer) {
         this.layer = layer;
         parent.notifyLayerChange();
+    }
+    
+    //TODO: Make sprite pos and direction apply
+    public boolean collidingWith(Sprite s) {
+        return (collisionMap.collides(s.collisionMap));
+    }
+    
+    public void moveTo(int x, int y) {
+        collisionMap.shift(x - this.x, y - this.y);
+        this.x = x;
+        this.y = y;
+    }
+    
+    public int getX() { return x; }
+    public int getY() { return y; }
+    
+    public double getDirection() { return direction; }
+    
+    public void setCollisionMap(CollisionMap cm) {
+        collisionMap = cm;
     }
 }

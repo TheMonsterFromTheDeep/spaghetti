@@ -8,4 +8,9 @@ public class Vector2 {
         this.x = x;
         this.y = y;
     }
+    
+    public void shift(int x, int y) {
+        this.x += x;
+        this.y += y;
+    }
 }

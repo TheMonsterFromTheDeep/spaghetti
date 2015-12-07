@@ -70,8 +70,8 @@ public class Camera {
             if(sprite.graphic >= 0 && sprite.graphic < graphics.length) {
                 float xoff = (float)graphics[sprite.graphic].getWidth() / 2;
                 float yoff = (float)graphics[sprite.graphic].getHeight() / 2;
-                renderer.rotate(sprite.direction, xoff, yoff);
-                graphics[sprite.graphic].render(renderer, sprite.x - (int)xoff, sprite.y - (int)yoff);
+                renderer.rotate(sprite.getDirection(), xoff, yoff);
+                graphics[sprite.graphic].render(renderer, sprite.getX() - (int)xoff, sprite.getY() - (int)yoff);
             }
         }
     }

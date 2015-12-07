@@ -242,7 +242,7 @@ public class World {
     public void align() {        
         //TODO: Make World alignment much more efficient
         if(!correctlyAligned) {
-            alignedSize = deNullify();
+            alignedSize = deNullify() + 1;
             if(alignedSize > 0) {
                 quickSortSprites(0, alignedSize - 1);
             }

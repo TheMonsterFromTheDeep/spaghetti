@@ -2,16 +2,53 @@ package fettuccine.sprite;
 
 import fettuccine.geom.Rectangle;
 import fettuccine.geom.Vector2;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 
 public class CollisionMap {
     public static final class MapComponent {
         public static final byte MODE_INTERSECT = 0;
-        public static final byte MODE_NOT_INTERSECT = 1;
+        public static final byte MODE_IGNORE = 1;
         
         Rectangle bounds;
         
         Vector2[] data;
         byte mode;
+        
+        public static MapComponent createMapComponentFromMap(BufferedImage b, int red) {
+            MapComponent mc = new MapComponent();
+            
+            int pointCount = 0;
+            
+            for(int x = 0; x < b.getWidth(); x++) {
+                for(int y = 0; y < b.getHeight(); y++) {
+                    Color c = new Color(b.getRGB(x, y));
+                    if(c.getBlue() < 2 && c.getRed() == red) {
+                        if(pointCount < c.getGreen()) {
+                            pointCount = c.getGreen();
+                        }
+                        if(c.getGreen() == 0) {
+                            mc.mode = (byte)c.getBlue();
+                        }
+                    }
+                }
+            }
+            
+            mc.data = new Vector2[pointCount + 1];
+            
+            for(int x = 0; x < b.getWidth(); x++) {
+                for(int y = 0; y < b.getHeight(); y++) {
+                    Color c = new Color(b.getRGB(x, y));
+                    if(c.getBlue() < 2 && c.getRed() == red) {
+                        mc.data[c.getGreen()] = new Vector2(x, y);
+                    }
+                }
+            }
+            
+            mc.calculateBounds();
+            
+            return mc;
+        }
         
         public MapComponent() {
             data = new Vector2[0];
@@ -29,7 +66,7 @@ public class CollisionMap {
                 if(v.x < bounds.x) { bounds.x = v.x; }
                 if(v.y < bounds.y) { bounds.y = v.y; }
                 if(v.x > bounds.right()) { bounds.setRight(v.x); }
-                if(v.y < bounds.bottom()) { bounds.setBottom(v.y); }
+                if(v.y > bounds.bottom()) { bounds.setBottom(v.y); }
             }
         }
         
@@ -38,6 +75,12 @@ public class CollisionMap {
             if(point.y < bounds.y) { bounds.y = point.y; }
             if(point.x > bounds.right()) { bounds.setRight(point.x); }
             if(point.y < bounds.bottom()) { bounds.setBottom(point.y); }
+        }
+        
+        public void shift(int x, int y) {
+            for(Vector2 v : data) {
+                v.shift(x, y);
+            }
         }
         
         public boolean intersects(Vector2 v) {
@@ -53,9 +96,14 @@ public class CollisionMap {
         }
         
         public boolean intersects(MapComponent m) {
+            //System.err.println("begin intersection check...");
             if(bounds.intersects(m.bounds)) {
+                //System.err.println("checking for intersection!");
                 for(Vector2 v : m.data) {
                     if(this.intersects(v)) { return true; }
+                }
+                for(Vector2 v : data) {
+                    if(m.intersects(v)) { return true; }
                 }
                 return false;
             }
@@ -63,13 +111,12 @@ public class CollisionMap {
         }
         
         public boolean isColliding(MapComponent m) {
-            switch(mode) {
-                case MODE_INTERSECT:
-                    return intersects(m);
-                case MODE_NOT_INTERSECT:
-                    return !intersects(m);
-                default:
-                    return intersects(m);
+            if(m.mode == MODE_INTERSECT) {
+                return (this.mode == MODE_INTERSECT) ? intersects(m) : !intersects(m);
+            }
+            else {
+                //If both are ignoring, return false
+                return (this.mode == MODE_INTERSECT) ? !intersects(m) : false;
             }
         }
     }
@@ -85,10 +132,31 @@ public class CollisionMap {
         return false;
     }
     
-    public static void test() {
-        //MapComponent mc1 = new MapComponent();
-        MapComponent mc1 = new MapComponent(new Vector2[]{ new Vector2(0, 0), new Vector2(0, 10), new Vector2(10, 10), new Vector2(10, 0)});
-        MapComponent mc2 = new MapComponent(new Vector2[]{ new Vector2(5, 5), new Vector2(5, 15), new Vector2(15, 15), new Vector2(15, 0)});
-        System.err.println(mc1.intersects(mc2));
+    public void shift(int x, int y) {
+        for(MapComponent mc : components) {
+            mc.shift(x, y);
+        }
+    }
+    
+    public static CollisionMap createMapFromMapImage(BufferedImage b) {
+        int mapCompCount = -1;
+        for(int x = 0; x < b.getWidth(); x++) {
+            for(int y = 0; y < b.getHeight(); y++) {
+                Color c = new Color(b.getRGB(x, y));
+                if(c.getBlue() < 2) {
+                    if(mapCompCount < c.getRed()) {
+                        mapCompCount = c.getRed();
+                    }
+                }
+            }
+        }
+        
+        CollisionMap cm = new CollisionMap();
+        cm.components = new MapComponent[mapCompCount + 1];
+        for(int i = 0; i <= mapCompCount; i++) {
+            cm.components[i] = MapComponent.createMapComponentFromMap(b, i);
+        }
+        
+        return cm;
     }
 }
