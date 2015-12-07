@@ -2,6 +2,9 @@ package fettuccine.graphics;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -14,7 +17,7 @@ public class Renderer {
     int height;
     
     BufferedImage buffer;
-    Graphics graphics;
+    Graphics2D graphics;
     
     Color background;
     
@@ -101,6 +104,28 @@ public class Renderer {
         BufferedImage result = op.createCompatibleDestImage(image, null);
         op.filter(image, result);
         graphics.drawImage(result, x - ((result.getWidth() / image.getWidth()) * image.getWidth()) / 2, y - ((result.getHeight() / image.getHeight()) * image.getHeight()) / 2, null);
+    }
+    
+    /**
+     * Draws a Rectangle of with the specified size at the specified coordinates.<br /><br />
+     * 
+     * Any transforms that the Renderer currently possesses are applied to the rectangle.<br /><br />
+     * 
+     * The coordinates given are treated at the coordinates of the upper-left corner of the rectangle.
+     * @param x The x coordinate to draw the rectangle at.
+     * @param y The y coordinate to draw the rectangle at.
+     * @param width The width of the rectangle.
+     * @param height The height of the rectangle.
+     * @param c The color of the rectangle.
+     */
+    public void drawRectangle(int x, int y, int width, int height, Color c) {
+        //TODO: Do this much better
+        
+        Rectangle rect = new Rectangle(0, 0, width, height);
+        Shape s = transform.createTransformedShape(rect);
+        s = AffineTransform.getTranslateInstance(x, y).createTransformedShape(s);
+        graphics.setColor(c);
+        graphics.fill(s);
     }
     
     public void renderTo(Graphics target, int x, int y, int width, int height) {

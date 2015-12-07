@@ -1,55 +1,35 @@
 package fettuccine.graphics;
 
-import util.Resources;
-import java.awt.image.BufferedImage;
-
 /**
- * Contains graphical image data.<br /><br />
+ * A Graphic object represents graphical data of some type that can be drawn to
+ * a Renderer. Graphics objects can represent image data or some other simpler data,
+ * such as a colored rectangular shape.<br /><br />
  * 
- * Graphic objects are used to represent the appearance of Sprites and draw them
- * on to the screen. Graphic objects used for Sprite drawing are contained in
- * a Camera instance and drawn by it.<br /><br />
- * 
+ * A Graphic subclass must implement the render() method, which is how the Graphic object
+ * is rendered.
  * @author TheMonsterFromTheDeep
  */
-public class Graphic {
-    /** The graphical data of the Graphic. */
-    BufferedImage data;
-    
+public interface Graphic {
     /**
-     * Creates a Graphic based on the specified BufferedImage.
-     * @param data An image representing the appearance of the Graphic.
-     */
-    public Graphic(BufferedImage data) {
-        this.data = data;
-    }
-    
-    /**
-     * Creates a Graphic by loading image data from a relative path.<br /><br />
+     * Renders the graphical data represented by this Graphic object
+     * to the specified Renderer.<br /><br />
      * 
-     * The path is relative to the root of the compiled JAR file.
-     * @param relPath The relative path to load image data from.
+     * This will, of course, apply any transformations that the Renderer
+     * object contains.
+     * @param r The Renderer to render the Graphic with.
+     * @param x The x position to render the Graphic at.
+     * @param y The y position to render the Graphic at.
      */
-    public Graphic(String relPath) {
-        this.data = Resources.loadImageResource(relPath);
-    }
+    void render(Renderer r, int x, int y);
     
-    /**
-     * Renders the Graphic using the specified Renderer at a specific<br /><br />
-     * x and y coordinate.
-     * 
-     * The coordinates given are treated as the coordinates of the upper-left
-     * corner of the image.<br /><br />
-     * 
-     * This will apply any transforms the Renderer currently contains.
-     * @param target The Renderer to render the image with.
-     * @param x The x coordinate to render the image at. 
-     * @param y The y coordinate to render the image at.
+    /** 
+     * Returns a value representing the width of the Graphic. This should be equal to the width of its bounds, or similar.
+     * @return The width of the Graphic's bounds.
      */
-    public void render(Renderer target, int x, int y) {
-        target.drawImage(data, x, y);
-    }
-    
-    public int getWidth() { return data.getWidth(); }
-    public int getHeight() { return data.getHeight(); }
+    int getWidth();
+    /** 
+     * Returns a value representing the height of the Graphic. This should be equal to the height of its bounds, or similar.
+     * @return The height of the Graphic's bounds.
+     */
+    int getHeight();
 }
