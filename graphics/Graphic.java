@@ -1,6 +1,6 @@
 package fettuccine.graphics;
 
-import fettuccine.uitl.Resources;
+import util.Resources;
 import java.awt.image.BufferedImage;
 
 /**
