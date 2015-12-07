@@ -1,4 +1,4 @@
-package fettuccine;
+package fettuccine.uitl;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;

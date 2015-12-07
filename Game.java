@@ -1,5 +1,7 @@
 package fettuccine;
 
+import fettuccine.graphics.RenderData;
+import fettuccine.graphics.Renderer;
 import fettuccine.control.KeyControl;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -13,8 +15,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import javax.sound.sampled.Clip;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -93,24 +93,22 @@ public class Game extends JFrame implements ActionListener {
                
         panel = new JPanel() {
             @Override
-            public void paintComponent(Graphics g) {         
+            public void paintComponent(Graphics g) {
                 if(fill) {
                     g.setColor(Color.BLACK);
-                    g.fillRect(0, 0, getWidth(), getHeight());
+                    g.fillRect(0, 0, this.getWidth(), this.getHeight());
                     
                     fill = false;
                 }
-                else {
-                    renderer.renderTo(g, renderData);
-                }
+                renderer.renderTo(g, renderData);
             }
         };
         panel.setPreferredSize(new Dimension(renderData.renderWidth, renderData.renderHeight));
-        panel.setBackground(new Color(0));
-        
         this.add(panel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
+        
+        panel.setBackground(new Color(0));
         
         this.setVisible(true);
     }
@@ -157,12 +155,12 @@ public class Game extends JFrame implements ActionListener {
     
     protected final int getMouseX() {
         int screenx = MouseInfo.getPointerInfo().getLocation().x - this.getLocationOnScreen().x - this.getInsets().left;
-        return (int)(renderData.scaleX * (screenx - renderData.renderX));
+        return (int)((1 / renderData.scaleX) * (screenx - renderData.renderX));
     }
     
     protected final int getMouseY() {
         int screeny = MouseInfo.getPointerInfo().getLocation().y - this.getLocationOnScreen().y - this.getInsets().top;
-        return (int)(renderData.scaleY * (screeny - renderData.renderY));
+        return (int)((1 / renderData.scaleY) * (screeny - renderData.renderY));
     }
     
     protected final void watchControl(KeyControl kc) {

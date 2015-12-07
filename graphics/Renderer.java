@@ -1,4 +1,4 @@
-package fettuccine;
+package fettuccine.graphics;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -57,7 +57,9 @@ public class Renderer {
     }
     
     public void rotate(double degrees, BufferedImage anchor) {
-        transform.concatenate(AffineTransform.getRotateInstance(Math.toRadians(degrees), ((double)anchor.getWidth()) / 2, ((double)anchor.getHeight()) / 2));
+        AffineTransformOp op = new AffineTransformOp(transform, interpolation);
+        BufferedImage transAnchor = op.createCompatibleDestImage(anchor, null);
+        transform.concatenate(AffineTransform.getRotateInstance(Math.toRadians(degrees), (((float)transAnchor.getWidth() / anchor.getWidth()) * anchor.getWidth()) / 2, (((float)transAnchor.getHeight() / anchor.getHeight()) * anchor.getHeight()) / 2));
     }
     
     public void reset() { 
@@ -65,20 +67,40 @@ public class Renderer {
     }
     
     /**
-     * Draws the specified image centered on the specified x and y coordinates.
+     * Draws the specified image at the specified x and y coordinates.<br /><br />
      * 
-     * Applies any transformation matrix that the renderer currently possesses to
-     * the drawn image.
-     * @param image
-     * @param x
-     * @param y 
+     * Any transforms that the Renderer currently possesses are applied to the
+     * image.<br /><br />
+     * 
+     * The coordinates given are treated as the coordinates of the upper-left
+     * corner of the image. 
+     * @param image The image to draw.
+     * @param x The x coordinate of the upper-left corner of the destination of the image.
+     * @param y The y coordinate of the upper-left corner of the destination of the image.
      */
     public void drawImage(BufferedImage image, int x, int y) {
         AffineTransformOp op = new AffineTransformOp(transform, interpolation);
         BufferedImage result = op.createCompatibleDestImage(image, null);
-        System.err.println(result.getWidth() + " " + result.getHeight());
         op.filter(image, result);
-        graphics.drawImage(result, x - (image.getWidth() / 2), y - (image.getHeight() / 2), null);
+        graphics.drawImage(result, x, y, null);
+    }
+    
+    /**
+     * Draws the specified image centered on the specified x and y coordinates.<br /><br />
+     * 
+     * Any transforms that the Renderer currently possesses are applied to the
+     * image.<br /><br />
+     * 
+     * The coordinates given are treated as the coordinates of the center of the image.
+     * @param image The image to draw.
+     * @param x The x coordinate of the upper-left corner of the destination of the image.
+     * @param y The y coordinate of the upper-left corner of the destination of the image.
+     */
+    public void drawImageCentered(BufferedImage image, int x, int y) {
+        AffineTransformOp op = new AffineTransformOp(transform, interpolation);
+        BufferedImage result = op.createCompatibleDestImage(image, null);
+        op.filter(image, result);
+        graphics.drawImage(result, x - ((result.getWidth() / image.getWidth()) * image.getWidth()) / 2, y - ((result.getHeight() / image.getHeight()) * image.getHeight()) / 2, null);
     }
     
     public void renderTo(Graphics target, int x, int y, int width, int height) {

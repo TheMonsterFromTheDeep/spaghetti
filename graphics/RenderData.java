@@ -1,4 +1,4 @@
-package fettuccine;
+package fettuccine.graphics;
 
 public class RenderData {
     
