@@ -6,14 +6,10 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 public class CollisionMap {
-    public static final class MapComponent {
-        public static final byte MODE_INTERSECT = 0;
-        public static final byte MODE_IGNORE = 1;
-        
+    public static final class MapComponent {       
         Rectangle bounds;
         
         Vector2[] data;
-        byte mode;
         
         public static MapComponent createMapComponentFromMap(BufferedImage b, int red) {
             MapComponent mc = new MapComponent();
@@ -23,12 +19,9 @@ public class CollisionMap {
             for(int x = 0; x < b.getWidth(); x++) {
                 for(int y = 0; y < b.getHeight(); y++) {
                     Color c = new Color(b.getRGB(x, y));
-                    if(c.getBlue() < 2 && c.getRed() == red) {
+                    if(c.getBlue() < 1 && c.getRed() == red) {
                         if(pointCount < c.getGreen()) {
                             pointCount = c.getGreen();
-                        }
-                        if(c.getGreen() == 0) {
-                            mc.mode = (byte)c.getBlue();
                         }
                     }
                 }
@@ -39,7 +32,7 @@ public class CollisionMap {
             for(int x = 0; x < b.getWidth(); x++) {
                 for(int y = 0; y < b.getHeight(); y++) {
                     Color c = new Color(b.getRGB(x, y));
-                    if(c.getBlue() < 2 && c.getRed() == red) {
+                    if(c.getBlue() < 1 && c.getRed() == red) {
                         mc.data[c.getGreen()] = new Vector2(x, y);
                     }
                 }
@@ -83,6 +76,12 @@ public class CollisionMap {
             }
         }
         
+        public void rotate(int x, int y, double degrees) {
+            for(Vector2 v : data) {
+                v.rotate(x, y, degrees);
+            }
+        }
+        
         public boolean intersects(Vector2 v) {
             //Thanks to http://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon#answer-2922778
             int i, j;
@@ -111,13 +110,7 @@ public class CollisionMap {
         }
         
         public boolean isColliding(MapComponent m) {
-            if(m.mode == MODE_INTERSECT) {
-                return (this.mode == MODE_INTERSECT) ? intersects(m) : !intersects(m);
-            }
-            else {
-                //If both are ignoring, return false
-                return (this.mode == MODE_INTERSECT) ? !intersects(m) : false;
-            }
+            return intersects(m);
         }
     }
     
@@ -138,14 +131,21 @@ public class CollisionMap {
         }
     }
     
+    public void rotate(int x, int y, double degrees) {
+        for(MapComponent mc : components) {
+            mc.rotate(x, y, degrees);
+        }
+    }
+    
     public static CollisionMap createMapFromMapImage(BufferedImage b) {
         int mapCompCount = -1;
         for(int x = 0; x < b.getWidth(); x++) {
             for(int y = 0; y < b.getHeight(); y++) {
                 Color c = new Color(b.getRGB(x, y));
-                if(c.getBlue() < 2) {
+                if(c.getBlue() < 1) {
                     if(mapCompCount < c.getRed()) {
                         mapCompCount = c.getRed();
+                        System.err.println("new red!" + mapCompCount);
                     }
                 }
             }
