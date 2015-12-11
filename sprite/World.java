@@ -12,6 +12,9 @@ public class World {
     /** Stores the number of Sprites that the World expands its array by when it needs more space. */
     static final int GROW_SPRITE_COUNT = 10;
     
+    /** The associated system of the World. The World will automatically handle registering Sprites with it. */
+    SpriteSystem associatedSystem;
+    
     /** 
      * Stores all the Sprites that the World is aware of. Sprites parented to this world can get
      * information about these Sprites.
@@ -29,17 +32,21 @@ public class World {
     /** If correctlyAligned is true, this indicates the size of the non-null section of Sprites the World contains. */
     private int alignedSize = 0;
     
-    /** Creates a new, empty World. It will contain World.INIT_SPRITE_COUNT empty Sprites. */
-    public World() {
+    /** Creates a new, empty World. It will contain World.INIT_SPRITE_COUNT empty Sprites.
+     * @param system */
+    public World(SpriteSystem system) {
         sprites = new Sprite[INIT_SPRITE_COUNT];
+        associatedSystem = system;
     }
     
     /**
      * Creates a new, empty World of the specified length.
      * @param length The amount of Sprites the World will contain by default.
+     * @param system
      */
-    public World(int length) {
+    public World(int length, SpriteSystem system) {
         sprites = new Sprite[length];
+        associatedSystem = system;
     }
     
     /** 
@@ -53,7 +60,7 @@ public class World {
      * @return An isolated, completely empty World object.
      */
     public static World getNullWorld() {
-        return new World(0);
+        return new World(0, null);
     }
     
     /**
@@ -69,6 +76,7 @@ public class World {
      */
     public void addSprite(Sprite s) {
         s.parent = this;
+        s.system = this.associatedSystem;
         
         for(int i = 0; i < sprites.length; i++) {
             if(sprites[i] == null) { //If there is an empty spot in the array, insert the Sprite there
@@ -242,7 +250,7 @@ public class World {
     public void align() {        
         //TODO: Make World alignment much more efficient
         if(!correctlyAligned) {
-            alignedSize = deNullify();
+            alignedSize = deNullify() + 1;
             if(alignedSize > 0) {
                 quickSortSprites(0, alignedSize - 1);
             }

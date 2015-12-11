@@ -1,6 +1,7 @@
 package fettuccine.sprite;
 
 import fettuccine.graphics.Graphic;
+import fettuccine.graphics.ImageGraphic;
 import fettuccine.graphics.Renderer;
 
 /**
@@ -21,7 +22,7 @@ public class Camera {
         graphics = new Graphic[0];
     }
     
-    public Camera(Graphic[] graphics) {
+    public Camera(ImageGraphic[] graphics) {
         this.graphics = graphics;
     }
     
@@ -39,19 +40,19 @@ public class Camera {
         System.arraycopy(newGraphics, 0, graphics, tmp.length, newGraphics.length);
     }
     
-    public void addGraphic(String relPath) {
+    public void addImageGraphic(String relPath) {
         Graphic[] tmp = graphics;
         graphics = new Graphic[graphics.length + 1];
         System.arraycopy(tmp,0,graphics,0,tmp.length);
-        graphics[tmp.length] = new Graphic(relPath);
+        graphics[tmp.length] = new ImageGraphic(relPath);
     }
     
-    public void addGraphics(String[] relPaths) {
+    public void addImageGraphics(String[] relPaths) {
         Graphic[] tmp = graphics;
         graphics = new Graphic[graphics.length + relPaths.length];
         System.arraycopy(tmp,0,graphics,0,tmp.length);
         for(int i = 0; i < relPaths.length; i++) {
-            graphics[tmp.length + i] = new Graphic(relPaths[i]);
+            graphics[tmp.length + i] = new ImageGraphic(relPaths[i]);
         }
     }
     
@@ -67,10 +68,10 @@ public class Camera {
             Sprite sprite = w.sprites[i];
             
             if(sprite.graphic >= 0 && sprite.graphic < graphics.length) {
-                float xoff = (float)graphics[sprite.graphic].getWidth() / 2;
-                float yoff = (float)graphics[sprite.graphic].getHeight() / 2;
-                renderer.rotate(sprite.direction, xoff, yoff);
-                graphics[sprite.graphic].render(renderer, sprite.x - (int)xoff, sprite.y - (int)yoff);
+                //float xoff = (float)graphics[sprite.graphic].getWidth() / 2;
+                //float yoff = (float)graphics[sprite.graphic].getHeight() / 2;
+                renderer.rotate(sprite.getDirection(), 8, 8);
+                graphics[sprite.graphic].render(renderer, sprite.getX(), sprite.getY());//(int)(sprite.getX() - xoff), (int)(sprite.getY() - yoff));
             }
         }
     }

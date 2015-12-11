@@ -16,13 +16,16 @@ package fettuccine.sprite;
 public class Sprite {
     /** The parent World of the Sprite. The Sprite can access various data through the World object. */
     World parent;
+    SpriteSystem system;
     
     private int layer = 0;
     public int graphic = 0;
     
-    public double direction;
+    private double direction;
     
-    public int x, y;
+    private int x, y;
+    
+    CollisionMap collisionMap;
     
     public Sprite() { 
         x = 0;
@@ -86,4 +89,38 @@ public class Sprite {
         this.layer = layer;
         parent.notifyLayerChange();
     }
-}
+    
+    public final void setAppearance(int id) {
+        this.graphic = id;
+        this.collisionMap = system.getMapById(id);
+    }
+    
+    //TODO: Make sprite pos and direction apply
+    public boolean collidingWith(Sprite s) {
+        return (collisionMap.collides(s.collisionMap));
+    }
+    
+    public void rotate(double degrees) {
+        collisionMap.rotate(degrees);
+        direction += degrees;
+    }
+    
+    public void moveTo(int x, int y) {
+        collisionMap.shift(x - this.x, y - this.y);
+        this.x = x;
+        this.y = y;
+    }
+    
+    public float getX() { return x; }
+    public float getY() { return y; }
+    
+    public double getDirection() { return direction; }
+    
+    public void setCollisionMap(CollisionMap cm) {
+        collisionMap = cm;
+    }
+    
+    public void printBounds() {
+        collisionMap.printBounds();
+    }
+} 
