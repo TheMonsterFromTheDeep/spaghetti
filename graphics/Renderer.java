@@ -3,8 +3,6 @@ package fettuccine.graphics;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -82,9 +80,28 @@ public class Renderer {
      * @param y The y coordinate of the upper-left corner of the destination of the image.
      */
     public void drawImage(BufferedImage image, int x, int y) {
-        AffineTransformOp op = new AffineTransformOp(transform, interpolation);
-        BufferedImage result = op.createCompatibleDestImage(image, null);
+        float[] tmp = new float[] { 0, 0, image.getWidth(), 0, image.getWidth(), image.getHeight(), 0, image.getHeight() };
+        
+        transform.transform(tmp, 0, tmp, 0, 4);
+        
+        float minx = 0;
+        float miny = 0;
+        float maxx = 0;
+        float maxy = 0;
+        for(int i = 0; i < tmp.length; i += 2) {
+            if(tmp[i] < minx) { minx = tmp[i]; }
+            if(tmp[i + 1] < miny) { miny = tmp[i + 1]; }
+            if(tmp[i] > maxx) { maxx = tmp[i]; }
+            if(tmp[i + 1] > maxy) { maxy = tmp[i + 1]; }
+        }
+        
+        AffineTransform tmpt = new AffineTransform(transform);
+        tmpt.preConcatenate(AffineTransform.getTranslateInstance((maxx - minx) - image.getWidth(), (maxy - miny) - image.getHeight()));
+        
+        AffineTransformOp op = new AffineTransformOp(tmpt, interpolation);
+        BufferedImage result = op.createCompatibleDestImage(image, null);       
         op.filter(image, result);
+        
         graphics.drawImage(result, x, y, null);
     }
     
@@ -123,28 +140,6 @@ public class Renderer {
         op.filter(image, result);
         //graphics.drawImage(result, (int)(x - ((result.getWidth() / image.getWidth()) * (float)image.getWidth()) / 2), (int)(y - ((result.getHeight() / image.getHeight()) * (float)image.getHeight()) / 2), null);
         graphics.drawImage(result, (int)(x - (float)result.getWidth() / 2),(int)(y - (float)result.getHeight() / 2), null);
-    }
-    
-    /**
-     * Draws a Rectangle of with the specified size at the specified coordinates.<br /><br />
-     * 
-     * Any transforms that the Renderer currently possesses are applied to the rectangle.<br /><br />
-     * 
-     * The coordinates given are treated at the coordinates of the upper-left corner of the rectangle.
-     * @param x The x coordinate to draw the rectangle at.
-     * @param y The y coordinate to draw the rectangle at.
-     * @param width The width of the rectangle.
-     * @param height The height of the rectangle.
-     * @param c The color of the rectangle.
-     */
-    public void drawRectangle(int x, int y, int width, int height, Color c) {
-        //TODO: Do this much better
-        
-        Rectangle rect = new Rectangle(0, 0, width, height);
-        Shape s = transform.createTransformedShape(rect);
-        s = AffineTransform.getTranslateInstance(x, y).createTransformedShape(s);
-        graphics.setColor(c);
-        graphics.fill(s);
     }
     
     public void renderTo(Graphics target, int x, int y, int width, int height) {

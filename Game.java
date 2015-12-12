@@ -19,7 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class Game extends JFrame implements ActionListener {   
+public class Game extends JFrame implements ActionListener, Callback {   
     private volatile boolean fill;
     
     private KeyControl[] keyControls;
@@ -36,6 +36,8 @@ public class Game extends JFrame implements ActionListener {
     private boolean mmbDown = false;
     
     private long tick;
+    
+    private Callback callback;
     
     public Game(String title, int defaultWidth, int defaultHeight, double scale) {
         super(title);
@@ -134,20 +136,26 @@ public class Game extends JFrame implements ActionListener {
     }
     
     @Override
-    public void actionPerformed(ActionEvent ae) {
+    public final void actionPerformed(ActionEvent ae) {
         ++tick;
-        loop(tick);
+        callback.loop(tick);
         panel.repaint(renderData.renderX, renderData.renderY, renderData.renderWidth, renderData.renderHeight);
     }
     
     public final void run() {
         setup();
+        callback = this;
         timer.start(); 
     }
     
     protected void setup() { };
     
-    protected void loop(long tick) { }
+    @Override
+    public void loop(long tick) { }
+    
+    protected final void setCallback(Callback c) {
+        callback = c;
+    }
     
     protected final boolean isLMBDown() { return lmbDown; }
     protected final boolean isMMBDown() { return mmbDown; }

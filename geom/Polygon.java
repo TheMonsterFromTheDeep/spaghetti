@@ -1,5 +1,11 @@
 package fettuccine.geom;
 
+/**
+ * A Polygon simply represents a collection of 2D points in 2D space, and contains
+ * methods for manipulating and testing them.
+ * 
+ * @author TheMonsterFromTheDeep
+ */
 public class Polygon {
     Vector2[] points;
     Rectangle bounds;
@@ -14,11 +20,19 @@ public class Polygon {
         calculateBounds();
     }
     
+    /**
+     * Causes the Polygon to re-calculate its bounds. This should be done
+     * after any operation that would change the bounds of the Polygon.<br /><br />
+     * 
+     * Operations can manually change the bounds instead, so that this
+     * method does not have to be run.<br /><br />
+     * 
+     * Bounds are used to determine things like whether Polygons intersect, and as
+     * such, bounds should always be consistent with the Polygon's geometry.
+     */
     public final void calculateBounds() {
-        System.err.println("---- " + points.length);
         bounds = new Rectangle(points[0], new Vector2(0));
         for(Vector2 v : points) {
-            System.err.println("height: " + bounds.height);
             if(v.x < bounds.x) { bounds.setLeft(v.x); }
             if(v.y < bounds.y) { bounds.setTop(v.y); }
             if(v.x > bounds.right()) { bounds.setRight(v.x); }
@@ -27,6 +41,13 @@ public class Polygon {
         
     }
     
+    /**
+     * Shifts the Polygon by the specified amount. This will also
+     * shift the bounds Rectangle by the same amount.
+     * 
+     * @param dx The distance to shift the Polygon along the x axis
+     * @param dy The distance to shift the Polygon along the y axis
+     */
     public void shift(float dx, float dy) {
         for(Vector2 v : points) {
             v.shift(dx, dy);
@@ -34,6 +55,15 @@ public class Polygon {
         bounds.shift(dx, dy);
     }
     
+    /**
+     * Rotates the Polygon by a specified amount around an anchor
+     * point.<br /><br />
+     * 
+     * Bounds are re-calculated during this method call.
+     * @param ax The x position of the anchor point.
+     * @param ay The y position of the anchor point.
+     * @param degrees The amount of degrees to rotate the Polygon.
+     */
     public void rotate(float ax, float ay, double degrees) {
         for(Vector2 v : points) {
             v.rotate(ax, ay, degrees);
@@ -41,6 +71,10 @@ public class Polygon {
         calculateBounds();
     }
     
+    /**
+     * Copies the Polygon - all its points, and its bounds.
+     * @return A Polygon with identical data to this one.
+     */
     public Polygon getCopy() {
         Polygon copy = new Polygon();
         copy.points = new Vector2[points.length];
@@ -139,6 +173,11 @@ public class Polygon {
         
     }
     
+    /**
+     * Tests whether the Polygon contains a specific point.
+     * @param v The point to test for.
+     * @return Whether the Polygon contains the point.
+     */
     public boolean contains(Vector2 v) {
             //Thanks to http://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon#answer-2922778
             int i, j;
@@ -151,9 +190,16 @@ public class Polygon {
             return c;
         }
     
+    /**
+     * Calculates whether this Polygon intersects the specified Polygon to test.<br /><br />
+     * 
+     * The Polygons count as intersecting if any of the edges intersect, or if one Polygon is
+     * contained completely by the other Polygon.
+     * @param test The Polygon to test intersection with.
+     * @return Whether the Polygons intersect (as described above).
+     */
     public boolean intersects(Polygon test) {        
         if(this.bounds.intersects(test.bounds)) {
-            System.err.println("bounds intersect!");
             IntersectTest[] thisTest = new IntersectTest[points.length];
             IntersectTest[] otherTest = new IntersectTest[test.points.length];
             
@@ -196,111 +242,6 @@ public class Polygon {
                 if(test.contains(v)) { return true; }
             }
         }
-        return false;
-            /*float m1, i1, m2, i2;
-            int gi1, li1, gi2, li2;
-            int spi, spj;
-            for(int i = 0; i < points.length; i++) {
-                System.err.println("i: " + i);
-                
-                spi = (i + 1 == points.length) ? 0 : i + 1;
-                if(points[i].x < points[spi].x) {
-                    li1 = i;
-                    gi1 = spi;
-                }
-                else {
-                    li1 = spi;
-                    gi1 = i;
-                }
-                //Vertical line: special case
-                if(points[li1].x == points[gi1].x) {                    
-                    for(int j = 0; j < test.points.length - 1; j++) {
-                        spj = (j + 1 == test.points.length) ? 0 : j + 1;
-                        if(test.points[j].x < test.points[spj].x) {
-                            li2 = j;
-                            gi2 = spj;
-                        }
-                        else {
-                            li2 = spj;
-                            gi2 = j;
-                        }
-                        //Two vertical lines: very special case
-                        if(test.points[li2].x == test.points[gi2].x) {
-                            //Check to see if vertical lines are in same position
-                            if(points[li1] == test.points[li2]) {
-                                float ly, gy;
-                                if(test.points[li2].y < test.points[gi2].y) {
-                                    ly = test.points[li2].y;
-                                    gy = test.points[gi2].y;
-                                }
-                                else {
-                                    ly = test.points[gi2].y;
-                                    gy = test.points[li2].y;
-                                }
-                                if((points[li1].y >= ly && points[li1].y <= gy) || (points[gi1].y >= ly && points[gi1].y <= gy)) { return true; }
-                            }
-                            //Skip rest of loop iteration
-                            continue;
-                        }
-                        m2 = (test.points[gi2].y - test.points[li2].y) / (test.points[gi2].x - test.points[li2].x);
-                        i2 = test.points[li2].y - (m2 * test.points[li2].x);
-                        
-                        float tx = points[li1].x;
-                        float ty = (m2 * tx) + i2;
-                        if(tx >= test.points[li2].x && tx <= test.points[gi2].x && ty >= test.points[li2].y && ty <= test.points[gi2].y) { return true; }
-                    }
-                    //Skip rest of loop iteration
-                    continue;
-                }
-                m1 = (points[gi1].y - points[li1].y) / (points[gi1].x - points[li1].x);
-                i1 = points[li1].y - (m1 * points[li1].x);
-                
-                for(int j = 0; j < test.points.length - 1; j++) {
-                    spj = (j + 1 == test.points.length) ? 0 : j + 1;
-                    if(test.points[j].x < test.points[spj].x) {
-                        li2 = j;
-                        gi2 = spj;
-                    }
-                    else {
-                        li2 = spj;
-                        gi2 = j;
-                    }
-                    //Vertical lines: special case
-                    System.err.println("Vertical line: " + (test.points[li2].x == test.points[gi2].x));
-                    if(test.points[li2].x == test.points[gi2].x) {
-                        float tx = test.points[li2].x;
-                        if(tx >= points[li1].x && tx <= points[gi1].x) { return true; }
-                        //Skip rest of loop iteration
-                        continue;
-                    }
-                    m2 = (test.points[gi2].y - test.points[li2].y) / (test.points[gi2].x - test.points[li2].x);
-                    i2 = test.points[li2].y - (m2 * test.points[li2].x);
-                    
-                    float tx = (i2 - i1) / (m1 - m2);
-                    float ty = (m1 * tx) + i1;
-                    System.err.println("1- first point: " + points[li1].x + " " + points[li1].y);
-                    System.err.println("1- second point: " + points[gi1].x + " " + points[gi1].y);
-                    System.err.println("2- first point: " + test.points[li2].x + " " + test.points[li2].y);
-                    System.err.println("2- second point: " + test.points[gi2].x + " " + test.points[gi2].y);
-                    System.err.println(tx >= test.points[li2].x);
-                    System.err.println(tx <= test.points[gi2].x);
-                    System.err.println("condition: " + ((tx >= points[li1].x) && (tx <= points[gi1].x) && (tx >= test.points[li2].x) && (tx <= test.points[gi2].x)
-                    && (ty >= points[li1].y) && (ty <= points[gi1].y) && (ty >= test.points[li2].y) && (ty <= test.points[gi2].y)));
-                    System.err.println("Comparing to: " + tx + " " + ty);
-                    if((tx >= points[li1].x) && (tx <= points[gi1].x) && (tx >= test.points[li2].x) && (tx <= test.points[gi2].x)
-                    && (ty >= points[li1].y) && (ty <= points[gi1].y) && (ty >= test.points[li2].y) && (ty <= test.points[gi2].y)) { return true; }
-                }
-            }*/
-        
-    }
-    
-    public void printBounds() {
-        System.err.println("Begin polygon dump");
-        System.err.println(bounds.width + " x " + bounds.height + " @ (" + bounds.x + ", " + bounds.y + ")");
-        System.err.println();
-        for(Vector2 v : points) {
-            System.err.println(v.x + " " + v.y);
-        }
-        System.err.println("---");
+        return false;        
     }
 }

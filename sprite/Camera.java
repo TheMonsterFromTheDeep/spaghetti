@@ -18,12 +18,28 @@ public class Camera {
     /** The graphical image data that the Camera will draw Sprites with. */
     Graphic[] graphics;
     
-    public Camera() {
+    /** Stores the x position of the top-left corner of the Camera. */
+    public float x;
+    /** Stores the y position of the top-left corner of the Camera. */
+    public float y;
+    
+    /** Stores the width of the Camera lens. */
+    float width;
+    /** Stores the height of the Camera lens. */
+    float height;
+    
+    public Camera(float width, float height) {
         graphics = new Graphic[0];
+        x = y = 0;
+        this.width = width;
+        this.height = height;
     }
     
-    public Camera(ImageGraphic[] graphics) {
+    public Camera(float width, float height, ImageGraphic[] graphics) {
         this.graphics = graphics;
+        x = y = 0;
+        this.width = width;
+        this.height = height;
     }
     
     public void addGraphic(Graphic g) {
@@ -56,6 +72,11 @@ public class Camera {
         }
     }
     
+    public void track(Sprite s) {
+        x = -s.getX() + width / 2;
+        y = -s.getY() + height / 2;
+    }
+    
     public void render(World w, Renderer renderer) {
         if(!w.isCorrectlyAligned()) {
             w.align();
@@ -68,10 +89,8 @@ public class Camera {
             Sprite sprite = w.sprites[i];
             
             if(sprite.graphic >= 0 && sprite.graphic < graphics.length) {
-                //float xoff = (float)graphics[sprite.graphic].getWidth() / 2;
-                //float yoff = (float)graphics[sprite.graphic].getHeight() / 2;
                 renderer.rotate(sprite.getDirection(), 8, 8);
-                graphics[sprite.graphic].render(renderer, sprite.getX(), sprite.getY());//(int)(sprite.getX() - xoff), (int)(sprite.getY() - yoff));
+                graphics[sprite.graphic].render(renderer, x + sprite.getX(), y + sprite.getY());//(int)(sprite.getX() - xoff), (int)(sprite.getY() - yoff));
             }
         }
     }

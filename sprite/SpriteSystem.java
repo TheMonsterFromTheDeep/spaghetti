@@ -40,8 +40,8 @@ public class SpriteSystem {
         }
     }
     
-    public Camera getCamera() {
-        Camera cam = new Camera();
+    public Camera getCamera(float width, float height) {
+        Camera cam = new Camera(width, height);
         cam.graphics = new Graphic[data.length];
         for(int i = 0; i < data.length; i++) {
             cam.graphics[i] = data[i].graphic;

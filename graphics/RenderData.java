@@ -1,5 +1,13 @@
 package fettuccine.graphics;
 
+/**
+ * Stores data about a screen being rendered. A RenderData class holds methods
+ * to recalculate offsets and other values used for rendering a scaled canvas of
+ * a fixed ratio inside a larger screen.<br /><br />
+ * 
+ * A RenderData can be passed directly to a Renderer when rendering.
+ * @author TheMonsterFromTheDeep
+ */
 public class RenderData {
     
     public int canvasWidth, canvasHeight;

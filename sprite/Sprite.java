@@ -111,6 +111,24 @@ public class Sprite {
         this.y = y;
     }
     
+    public void moveX(float x) {
+        collisionMap.shift(x, 0);
+        this.x += x;
+    }
+    
+    public void moveY(float y) {
+        collisionMap.shift(0, y);
+        this.y += y;
+    }
+    
+    public void move(float dist) {
+        float tmpx = this.x;
+        float tmpy = this.y;
+        this.x += Math.cos(Math.toRadians(direction)) * dist;
+        this.y += Math.sin(Math.toRadians(direction)) * dist;
+        collisionMap.shift(x - tmpx, y - tmpy);
+    }
+    
     public float getX() { return x; }
     public float getY() { return y; }
     
@@ -118,9 +136,5 @@ public class Sprite {
     
     public void setCollisionMap(CollisionMap cm) {
         collisionMap = cm;
-    }
-    
-    public void printBounds() {
-        collisionMap.printBounds();
     }
 } 
