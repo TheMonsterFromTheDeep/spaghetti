@@ -38,25 +38,21 @@ public class Resources {
      * @param relPath The relative path to load the audio clip from.
      * @return A Clip loaded from the specified path, or null if an exception occurred.
      */
-    /**
- 	* Loads an audio Clip from a path relative to the project root directory.
- 	* @param relPath The relative path to load the audio clip from.
- 	* @return A Clip loaded from the specified path, or null if an exception occurred.
- 	*/
 	public static Clip loadAudioResource(String relPath)
 	{
-    	try {
-        	File soundFile = new File(relPath);
-        	AudioInputStream soundIn = AudioSystem.getAudioInputStream(soundFile);
-        	AudioFormat format = soundIn.getFormat();
-        	DataLine.Info info = new DataLine.Info(Clip.class, format);
-        	Clip clip = (Clip)AudioSystem.getLine(info);
-        	clip.open(soundIn);
-        	return clip;   	 
-    	}
-    	catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
-        	System.err.println("Could not load audio resource! " + e.getMessage());
-        	return null;
-    	}
+	    try {
+		File soundFile = new File(relPath);
+		AudioInputStream soundIn = AudioSystem.getAudioInputStream(soundFile);
+		AudioFormat format = soundIn.getFormat();
+		DataLine.Info info = new DataLine.Info(Clip.class, format);
+		Clip clip = (Clip)AudioSystem.getLine(info);
+		clip.open(soundIn);
+		return clip;   	 
+	    }
+	    catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
+		System.err.println("Could not load audio resource! " + e.getMessage());
+		return null;
+	    }
 	}
+
 }
